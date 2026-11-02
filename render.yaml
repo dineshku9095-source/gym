@@ -1,0 +1,44 @@
+# Gymverse — Render Blueprint (API + optional web)
+# Set secrets in the Render dashboard; do not commit real values.
+
+services:
+  - type: web
+    name: gymverse-api
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: pnpm install && pnpm --filter @gymverse/shared-types build && pnpm --filter @gymverse/shared-validation build && pnpm db:generate && pnpm --filter @gymverse/api build
+    startCommand: pnpm --filter @gymverse/api start:prod
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_PORT
+        value: "4000"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: COOKIE_NAME
+        value: gymverse_token
+      - key: NOTIFICATION_CRON_MINUTES
+        value: "15"
+
+  - type: web
+    name: gymverse-web
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: pnpm install && pnpm --filter @gymverse/shared-types build && pnpm --filter @gymverse/shared-validation build && pnpm --filter @gymverse/web build
+    startCommand: pnpm --filter @gymverse/web start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
