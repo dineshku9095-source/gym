@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Logo } from './logo';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
@@ -27,9 +27,11 @@ export function AppShell({
   const router = useRouter();
   const { logout, user, loading } = useAuth();
 
-  if (!loading && !user) {
-    router.replace('/login');
-  }
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace('/login');
+    }
+  }, [loading, user, router]);
 
   return (
     <div className="flex min-h-screen bg-ink">
